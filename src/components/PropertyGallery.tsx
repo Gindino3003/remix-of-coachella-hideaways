@@ -37,49 +37,91 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
     setCurrentIndex((prev) => (prev === displayImages.length - 1 ? 0 : prev + 1));
   };
 
+  const selectThumbnail = (index: number) => {
+    setCurrentIndex(index);
+  };
+
   return (
     <>
-      {/* Gallery Grid */}
-      <div className="grid grid-cols-4 grid-rows-2 gap-2 h-[500px] rounded-2xl overflow-hidden">
+      {/* Main Gallery Layout */}
+      <div className="space-y-4">
         {/* Main Image */}
         <div
-          className="col-span-2 row-span-2 relative cursor-pointer group"
-          onClick={() => openGallery(0)}
+          className="relative aspect-[16/9] rounded-2xl overflow-hidden cursor-pointer group"
+          onClick={() => openGallery(currentIndex)}
         >
           <img
-            src={displayImages[0]}
+            src={displayImages[currentIndex]}
             alt={`${propertyName} - Main`}
             className="w-full h-full object-cover group-hover:scale-105 transition-smooth duration-500"
           />
           <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-smooth" />
-        </div>
+          
+          {/* Navigation arrows on main image */}
+          {displayImages.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToPrevious();
+                }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-background/80 backdrop-blur-sm text-foreground shadow-elevated hover:bg-background transition-smooth opacity-0 group-hover:opacity-100"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToNext();
+                }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-background/80 backdrop-blur-sm text-foreground shadow-elevated hover:bg-background transition-smooth opacity-0 group-hover:opacity-100"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </>
+          )}
 
-        {/* Secondary Images */}
-        {displayImages.slice(1, 5).map((image, index) => (
-          <div
-            key={index}
-            className="relative cursor-pointer group"
-            onClick={() => openGallery(index + 1)}
-          >
-            <img
-              src={image}
-              alt={`${propertyName} - ${index + 2}`}
-              className="w-full h-full object-cover group-hover:scale-105 transition-smooth duration-500"
-            />
-            <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-smooth" />
+          {/* Image counter */}
+          <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm text-sm font-medium">
+            {currentIndex + 1} / {displayImages.length}
           </div>
-        ))}
 
-        {/* Show All Button */}
-        {displayImages.length > 5 && (
+          {/* Show all button */}
           <button
-            onClick={() => openGallery(0)}
-            className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium shadow-soft hover:shadow-elevated transition-smooth"
+            onClick={(e) => {
+              e.stopPropagation();
+              openGallery(0);
+            }}
+            className="absolute bottom-4 left-4 flex items-center gap-2 px-4 py-2 rounded-lg bg-background/80 backdrop-blur-sm text-sm font-medium shadow-soft hover:bg-background transition-smooth"
           >
             <Grid3X3 size={16} />
             Show all {displayImages.length} photos
           </button>
-        )}
+        </div>
+
+        {/* Thumbnail Carousel */}
+        <div className="relative">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {displayImages.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => selectThumbnail(index)}
+                className={cn(
+                  "flex-shrink-0 w-32 h-20 rounded-xl overflow-hidden border-2 transition-smooth hover:opacity-100",
+                  index === currentIndex
+                    ? "border-primary opacity-100 shadow-soft"
+                    : "border-transparent opacity-70 hover:border-border"
+                )}
+              >
+                <img
+                  src={image}
+                  alt={`${propertyName} - Thumbnail ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Lightbox */}

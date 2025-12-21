@@ -1,4 +1,8 @@
 import desertOasis from "@/assets/property-desert-oasis.jpg";
+import desertOasis2 from "@/assets/property-desert-oasis-2.jpg";
+import desertOasis3 from "@/assets/property-desert-oasis-3.jpg";
+import desertOasis4 from "@/assets/property-desert-oasis-4.jpg";
+import desertOasis5 from "@/assets/property-desert-oasis-5.jpg";
 import palmSprings from "@/assets/property-palm-springs.jpg";
 import coachellaRanch from "@/assets/property-coachella-ranch.jpg";
 import laQuinta from "@/assets/property-la-quinta.jpg";
@@ -62,7 +66,7 @@ export const properties: Property[] = [
       "Quiet hours: 10 PM - 8 AM",
       "No unregistered guests"
     ],
-    images: [desertOasis],
+    images: [desertOasis, desertOasis2, desertOasis3, desertOasis4, desertOasis5],
     featured: true
   },
   {

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Calendar, Users, ChevronDown } from "lucide-react";
+import { Calendar, Users, ChevronDown, PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Property } from "@/data/properties";
 import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface BookingWidgetProps {
   property: Property;
@@ -13,6 +14,18 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
+  const [hasPet, setHasPet] = useState(false);
+
+  // Check if property allows pets
+  const allowsPets = property.houseRules.some(rule => 
+    rule.toLowerCase().includes("pets allowed")
+  );
+
+  // Extract pet fee from house rules if available
+  const petFeeMatch = property.houseRules.find(rule => 
+    rule.toLowerCase().includes("pets allowed")
+  )?.match(/\$(\d+)/);
+  const petFee = petFeeMatch ? parseInt(petFeeMatch[1]) : 50;
 
   const calculateNights = () => {
     if (!checkIn || !checkOut) return 0;
@@ -26,7 +39,8 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
   const subtotal = nights * property.pricePerNight;
   const cleaningFee = 150;
   const serviceFee = Math.round(subtotal * 0.12);
-  const total = subtotal + cleaningFee + serviceFee;
+  const petFeeTotal = hasPet ? petFee : 0;
+  const total = subtotal + cleaningFee + serviceFee + petFeeTotal;
 
   const handleBooking = () => {
     if (!checkIn || !checkOut) {
@@ -121,6 +135,42 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
         </div>
       </div>
 
+      {/* Pet Option */}
+      {allowsPets && (
+        <div className="mb-4 p-4 rounded-xl bg-secondary/50 border border-border">
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="hasPet"
+              checked={hasPet}
+              onCheckedChange={(checked) => setHasPet(checked as boolean)}
+              className="mt-0.5"
+            />
+            <div className="flex-1">
+              <label
+                htmlFor="hasPet"
+                className="flex items-center gap-2 text-sm font-medium text-foreground cursor-pointer"
+              >
+                <PawPrint size={16} className="text-primary" />
+                Bringing a pet?
+              </label>
+              <p className="text-xs text-muted-foreground mt-1">
+                Pet fee: ${petFee} (one-time fee, requires prior approval)
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No Pets Notice */}
+      {!allowsPets && (
+        <div className="mb-4 p-3 rounded-xl bg-muted/50 border border-border">
+          <p className="text-xs text-muted-foreground flex items-center gap-2">
+            <PawPrint size={14} />
+            No pets allowed at this property
+          </p>
+        </div>
+      )}
+
       {/* Book Button */}
       <Button
         variant="accent"
@@ -156,6 +206,15 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
             </span>
             <span className="text-foreground">${serviceFee}</span>
           </div>
+          {hasPet && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground underline cursor-help flex items-center gap-1">
+                <PawPrint size={12} />
+                Pet fee
+              </span>
+              <span className="text-foreground">${petFeeTotal}</span>
+            </div>
+          )}
           <div className="flex justify-between font-semibold pt-3 border-t border-border">
             <span>Total</span>
             <span>${total}</span>
