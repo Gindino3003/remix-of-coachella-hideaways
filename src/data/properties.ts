@@ -1,3 +1,4 @@
+import indianPalmsMain from "@/assets/property-indian-palms-main.jpg";
 import desertOasis from "@/assets/property-desert-oasis.jpg";
 import desertOasis2 from "@/assets/property-desert-oasis-2.jpg";
 import desertOasis3 from "@/assets/property-desert-oasis-3.jpg";
@@ -74,7 +75,7 @@ export const properties: Property[] = [
       "Quiet hours: 10 PM - 8 AM",
       "Stay 4+ nights for additional discounts"
     ],
-    images: [desertOasis, desertOasis2, desertOasis3, desertOasis4, desertOasis5],
+    images: [indianPalmsMain, desertOasis, desertOasis2, desertOasis3, desertOasis4, desertOasis5],
     featured: true
   },
   {
