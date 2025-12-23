@@ -6,7 +6,7 @@ import { properties } from "@/data/properties";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Star, Clock } from "lucide-react";
-import heroImage from "@/assets/hero-desert-villa.jpg";
+import heroImage from "@/assets/property-indian-palms-main.jpg";
 
 const Index = () => {
   const featuredProperties = properties.filter((p) => p.featured);
