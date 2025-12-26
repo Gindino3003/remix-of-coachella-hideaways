@@ -29,7 +29,7 @@ const Index = () => {
         setProperties(convertedProperties);
       } catch (err) {
         console.error('Failed to fetch properties:', err);
-        setError('Không thể tải danh sách properties. Vui lòng thử lại sau.');
+        setError('Unable to load the property list. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -61,7 +61,7 @@ const Index = () => {
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
                 <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
-                <p className="text-muted-foreground">Đang tải properties...</p>
+                <p className="text-muted-foreground">Loading properties...</p>
               </div>
             </div>
           ) : error ? (
