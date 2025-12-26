@@ -1,9 +1,36 @@
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PropertyCard } from "@/components/PropertyCard";
-import { properties } from "@/data/properties";
+import { Property } from "@/data/properties";
+import { fetchProperties, convertApiPropertyToProperty } from "@/services/api";
 
 const Properties = () => {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadProperties = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetchProperties();
+
+        // Chuyển đổi data từ API sang format của app
+        const convertedProperties = response.data.map(convertApiPropertyToProperty);
+        setProperties(convertedProperties);
+      } catch (err) {
+        console.error('Failed to fetch properties:', err);
+        setError('Không thể tải danh sách properties. Vui lòng thử lại sau.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProperties();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -27,15 +54,40 @@ const Properties = () => {
       {/* Properties Grid */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map((property, index) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                delay={index * 100}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
+                <p className="text-muted-foreground">Đang tải properties...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center max-w-md">
+                <p className="text-destructive mb-4">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Thử lại
+                </button>
+              </div>
+            </div>
+          ) : properties.length === 0 ? (
+            <div className="flex items-center justify-center py-20">
+              <p className="text-muted-foreground text-lg">Không có properties nào.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {properties.map((property, index) => (
+                <PropertyCard
+                  key={property.id}
+                  property={property}
+                  delay={index * 100}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

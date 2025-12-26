@@ -25,6 +25,9 @@ export interface Property {
   houseRules: string[];
   images: string[];
   featured: boolean;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export const properties: Property[] = [

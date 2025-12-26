@@ -51,12 +51,12 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
           onClick={() => openGallery(currentIndex)}
         >
           <img
-            src={displayImages[currentIndex]}
+            src={`${displayImages[currentIndex]}`}
             alt={`${propertyName} - Main`}
             className="w-full h-full object-cover group-hover:scale-105 transition-smooth duration-500"
           />
           <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-smooth" />
-          
+
           {/* Navigation arrows on main image */}
           {displayImages.length > 1 && (
             <>

@@ -37,7 +37,7 @@ export const PropertyCard = ({ property, className, delay = 0 }: PropertyCardPro
         <div className="absolute bottom-4 left-4 z-20">
           <span className="px-3 py-1.5 rounded-full bg-background/95 backdrop-blur-sm text-sm font-semibold text-foreground">
             ${property.pricePerNight}{" "}
-            <span className="font-normal text-muted-foreground">/ night</span>
+            <span className="font-normal text-muted-foreground"></span>
           </span>
         </div>
         {/* Rating */}

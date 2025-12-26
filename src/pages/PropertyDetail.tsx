@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PropertyGallery } from "@/components/PropertyGallery";
 import { BookingWidget } from "@/components/BookingWidget";
-import { getPropertyById } from "@/data/properties";
+import { Property } from "@/data/properties";
+import { fetchPropertyById, convertApiPropertyDetailToProperty } from "@/services/api";
 import {
   Star,
   MapPin,
@@ -18,18 +20,65 @@ import { Button } from "@/components/ui/button";
 
 const PropertyDetail = () => {
   const { id } = useParams();
-  const property = getPropertyById(id || "");
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (!property) {
+  useEffect(() => {
+    const loadProperty = async () => {
+      if (!id) {
+        setError("Property ID is missing");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetchPropertyById(id);
+
+        // Chuyển đổi data từ API sang format của app
+        const convertedProperty = convertApiPropertyDetailToProperty(response);
+        setProperty(convertedProperty);
+      } catch (err) {
+        console.error('Failed to fetch property:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProperty();
+  }, [id]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="pt-32 pb-16 container mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent mb-4"></div>
+              <p className="text-muted-foreground">Đang tải thông tin property...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Error or not found state
+  if (error || !property) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <div className="pt-32 pb-16 container mx-auto px-4 lg:px-8 text-center">
           <h1 className="font-display text-4xl font-semibold mb-4">
-            Property Not Found
+            {error ? 'Error Loading Property' : 'Property Not Found'}
           </h1>
           <p className="text-muted-foreground mb-8">
-            The property you're looking for doesn't exist.
+            {error || "The property you're looking for doesn't exist."}
           </p>
           <Button asChild>
             <Link to="/properties">
@@ -104,43 +153,47 @@ const PropertyDetail = () => {
               </div>
 
               {/* Amenities */}
-              <div className="border-b border-border pb-8">
-                <h2 className="font-display text-2xl font-semibold mb-6">
-                  Amenities
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {property.amenities.map((amenity, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 text-foreground"
-                    >
-                      <Check size={18} className="text-primary flex-shrink-0" />
-                      <span>{amenity}</span>
-                    </div>
-                  ))}
+              {property.amenities && property.amenities.length > 0 && (
+                <div className="border-b border-border pb-8">
+                  <h2 className="font-display text-2xl font-semibold mb-6">
+                    Amenities
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {property.amenities.map((amenity, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 text-foreground"
+                      >
+                        <Check size={18} className="text-primary flex-shrink-0" />
+                        <span>{amenity}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* House Rules */}
-              <div>
-                <h2 className="font-display text-2xl font-semibold mb-6">
-                  House Rules
-                </h2>
-                <div className="space-y-3">
-                  {property.houseRules.map((rule, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-3 text-foreground"
-                    >
-                      <AlertCircle
-                        size={18}
-                        className="text-muted-foreground flex-shrink-0 mt-0.5"
-                      />
-                      <span className="text-muted-foreground">{rule}</span>
-                    </div>
-                  ))}
+              {property.houseRules && property.houseRules.length > 0 && (
+                <div>
+                  <h2 className="font-display text-2xl font-semibold mb-6">
+                    House Rules
+                  </h2>
+                  <div className="space-y-3">
+                    {property.houseRules.map((rule, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-3 text-foreground"
+                      >
+                        <AlertCircle
+                          size={18}
+                          className="text-muted-foreground flex-shrink-0 mt-0.5"
+                        />
+                        <span className="text-muted-foreground">{rule}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Booking Widget */}
