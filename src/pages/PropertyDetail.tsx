@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 const PropertyDetail = () => {
-  const { id } = useParams();
+  const { id: propkey } = useParams();
   const location = useLocation();
   const { city, state } = location.state || {};
   const [property, setProperty] = useState<Property | null>(null);
@@ -28,8 +28,8 @@ const PropertyDetail = () => {
 
   useEffect(() => {
     const loadProperty = async () => {
-      if (!id) {
-        setError("Property ID is missing");
+      if (!propkey) {
+        setError("Property key is missing");
         setLoading(false);
         return;
       }
@@ -37,10 +37,10 @@ const PropertyDetail = () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetchPropertyById(id);
+        const response = await fetchPropertyById(propkey);
 
         // Chuyển đổi data từ API sang format của app
-        const convertedProperty = convertApiPropertyDetailToProperty(response, city, state);
+        const convertedProperty = convertApiPropertyDetailToProperty(response, city, state, propkey);
         setProperty(convertedProperty);
       } catch (err) {
         console.error('Failed to fetch property:', err);
@@ -50,7 +50,7 @@ const PropertyDetail = () => {
     };
 
     loadProperty();
-  }, [id, city, state]);
+  }, [propkey, city, state]);
 
   // Loading state
   if (loading) {

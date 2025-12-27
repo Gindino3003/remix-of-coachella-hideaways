@@ -182,11 +182,12 @@ export const convertApiPropertyToProperty = (apiProp: ApiProperty): any => {
         address: apiProp.address,
         latitude: parseFloat(apiProp.latitude),
         longitude: parseFloat(apiProp.longitude),
+        propKey: apiProp.propKey,
     };
 };
 
 // Helper function to convert new API property content to app property format
-export const convertApiPropertyDetailToProperty = (response: NewApiPropertyContentResponse, city?: string, state?: string): any => {
+export const convertApiPropertyDetailToProperty = (response: NewApiPropertyContentResponse, city?: string, state?: string, propkey?: string): any => {
     if (!response.getPropertyContent || response.getPropertyContent.length === 0) {
         throw new Error('No property content found');
     }
@@ -260,10 +261,12 @@ export const convertApiPropertyDetailToProperty = (response: NewApiPropertyConte
 
     return {
         id: apiProp.propId,
-        name: apiProp.name || firstRoom?.name || null,
+        propKey: propkey,
+        roomId: firstRoom?.roomId || '',
+        name: apiProp.name || firstRoom?.name || '',
         tagline: firstRoom?.texts?.displayName?.EN || apiProp.name,
         description: description,
-        location: city && state ? `${city}, ${state}` : null,
+        location: city && state ? `${city}, ${state}` : '',
         city: city,
         state: state,
         bedrooms: bedrooms,
@@ -279,5 +282,6 @@ export const convertApiPropertyDetailToProperty = (response: NewApiPropertyConte
         checkInTime: checkInTime,
         checkOutTime: checkOutTime,
         directions: apiProp.texts?.directions?.EN || '',
+        cleaningFee: apiProp.roomIds?.[0]?.cleaningFee || 0,
     };
 };
