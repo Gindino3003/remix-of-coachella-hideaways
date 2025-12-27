@@ -13,6 +13,7 @@ export const PropertyCard = ({ property, className, delay = 0 }: PropertyCardPro
   return (
     <Link
       to={`/property/${property.id}`}
+      state={{ city: property.city, state: property.state }}
       className={cn(
         "group block rounded-2xl overflow-hidden bg-card shadow-soft hover:shadow-elevated transition-smooth opacity-0 animate-fade-in-up",
         className

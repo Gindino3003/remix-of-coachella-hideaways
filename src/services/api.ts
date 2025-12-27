@@ -167,6 +167,8 @@ export const convertApiPropertyToProperty = (apiProp: ApiProperty): any => {
         tagline: `${apiProp.city}, ${apiProp.state}`,
         description: apiProp.description,
         location: `${apiProp.city}, ${apiProp.state}`,
+        city: apiProp.city,
+        state: apiProp.state,
         bedrooms: apiProp.bedrooms,
         bathrooms: apiProp.bathrooms,
         maxGuests: parseInt(apiProp.maxPeople),
@@ -184,7 +186,7 @@ export const convertApiPropertyToProperty = (apiProp: ApiProperty): any => {
 };
 
 // Helper function to convert new API property content to app property format
-export const convertApiPropertyDetailToProperty = (response: NewApiPropertyContentResponse): any => {
+export const convertApiPropertyDetailToProperty = (response: NewApiPropertyContentResponse, city?: string, state?: string): any => {
     if (!response.getPropertyContent || response.getPropertyContent.length === 0) {
         throw new Error('No property content found');
     }
@@ -246,9 +248,9 @@ export const convertApiPropertyDetailToProperty = (response: NewApiPropertyConte
     let bathrooms = 0;
     if (firstRoom?.featureCodes) {
         firstRoom.featureCodes.forEach((code: string[]) => {
-            if (code[0] === 'BEDROOM') bedrooms++;
-            if (code[0] === 'BATHROOM_FULL') bathrooms++;
-            if (code[0] === 'BATHROOM_HALF') bathrooms += 0.5;
+            if (code.some((item) => item === 'BEDROOM')) bedrooms++;
+            if (code.some((item) => item === 'BATHROOM_FULL')) bathrooms++;
+            if (code.some((item) => item === 'BATHROOM_HALF')) bathrooms += 0.5;
         });
     }
 
@@ -258,16 +260,18 @@ export const convertApiPropertyDetailToProperty = (response: NewApiPropertyConte
 
     return {
         id: apiProp.propId,
-        name: apiProp.name || firstRoom?.name || 'Property',
+        name: apiProp.name || firstRoom?.name || null,
         tagline: firstRoom?.texts?.displayName?.EN || apiProp.name,
         description: description,
-        location: 'Indio, CA', // Default location since API doesn't provide
-        bedrooms: bedrooms || 4,
-        bathrooms: bathrooms || 3,
-        maxGuests: 12, // Default since not directly in this API response
+        location: city && state ? `${city}, ${state}` : null,
+        city: city,
+        state: state,
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+        maxGuests: 12,
         pricePerNight: price,
-        rating: 5, // Default rating
-        reviews: 0, // Default reviews
+        rating: 5,
+        reviews: 0,
         amenities: amenities,
         houseRules: houseRules,
         images: images,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PropertyGallery } from "@/components/PropertyGallery";
@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 
 const PropertyDetail = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const { city, state } = location.state || {};
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ const PropertyDetail = () => {
         const response = await fetchPropertyById(id);
 
         // Chuyển đổi data từ API sang format của app
-        const convertedProperty = convertApiPropertyDetailToProperty(response);
+        const convertedProperty = convertApiPropertyDetailToProperty(response, city, state);
         setProperty(convertedProperty);
       } catch (err) {
         console.error('Failed to fetch property:', err);
@@ -48,7 +50,7 @@ const PropertyDetail = () => {
     };
 
     loadProperty();
-  }, [id]);
+  }, [id, city, state]);
 
   // Loading state
   if (loading) {

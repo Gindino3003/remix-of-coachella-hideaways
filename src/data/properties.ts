@@ -15,6 +15,8 @@ export interface Property {
   tagline: string;
   description: string;
   location: string;
+  city?: string;
+  state?: string;
   bedrooms: number;
   bathrooms: number;
   maxGuests: number;
