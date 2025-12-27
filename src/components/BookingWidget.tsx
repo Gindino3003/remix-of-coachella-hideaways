@@ -164,9 +164,24 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
     }
 
     toast({
-      title: "Booking request sent!",
-      description: "We'll confirm your reservation within 24 hours.",
+      title: "Redirecting to payment...",
+      description: "Please wait while we transfer you to our secure booking engine.",
     });
+
+    // Construct Beds24 Booking URL
+    const beds24Url = new URL("https://www.beds24.com/booking2.php");
+    beds24Url.searchParams.append("propid", property.id);
+    beds24Url.searchParams.append("checkin", checkIn);
+    beds24Url.searchParams.append("checkout", checkOut);
+    beds24Url.searchParams.append("numadult", guests.toString());
+    if (property.roomId) {
+      beds24Url.searchParams.append("roomid", property.roomId);
+    }
+
+    // Redirect to Beds24
+    setTimeout(() => {
+      window.location.href = beds24Url.toString();
+    }, 1500);
   };
 
   const displayPrice = () => {
@@ -220,7 +235,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
             </div>
           </div>
         </div>
-        {/* <div className="border-t border-border p-3">
+        <div className="border-t border-border p-3">
           <label className="block text-xs font-medium text-muted-foreground mb-1">
             GUESTS
           </label>
@@ -243,7 +258,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
             </div>
             <ChevronDown size={16} className="text-muted-foreground" />
           </div>
-        </div> */}
+        </div>
       </div>
 
       {/* Pet Option */}
