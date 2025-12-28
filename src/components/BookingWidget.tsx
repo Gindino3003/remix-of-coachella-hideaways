@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { Calendar, Users, ChevronDown, PawPrint, Loader2, X } from "lucide-react";
+import { Calendar as CalendarIcon, Users, ChevronDown, PawPrint, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Property } from "@/data/properties";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { fetchBookingData, formatStringDateToYYYYMMDD, BookingResponse } from "@/services/bookingApi";
+import { fetchBookingData, formatStringDateToYYYYMMDD, BookingResponse, formatDateToYYYYMMDD } from "@/services/bookingApi";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format, addMonths, isBefore, startOfToday, parseISO } from "date-fns";
 
 interface BookingWidgetProps {
   property: Property;
@@ -15,13 +18,18 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
   const { toast } = useToast();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+  const [checkInDate, setCheckInDate] = useState<Date | undefined>();
+  const [checkOutDate, setCheckOutDate] = useState<Date | undefined>();
   const [guests, setGuests] = useState(2);
   const [hasPet, setHasPet] = useState(false);
   const [bookingData, setBookingData] = useState<BookingResponse | null>(null);
+  const [allAvailability, setAllAvailability] = useState<BookingResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAvailabilityLoading, setIsAvailabilityLoading] = useState(false);
   const [selectedUpsells, setSelectedUpsells] = useState<Set<string>>(new Set());
   const [showIframe, setShowIframe] = useState(false);
   const [iframeUrl, setIframeUrl] = useState("");
+  const [isIframeLoading, setIsIframeLoading] = useState(false);
 
   const allowsPets = property.houseRules.some(rule =>
     rule.toLowerCase().includes("pets allowed")
@@ -32,6 +40,29 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
     rule.toLowerCase().includes("pets allowed")
   )?.match(/\$(\d+)/);
   const petFee = petFeeMatch ? parseInt(petFeeMatch[1]) : 50;
+
+  useEffect(() => {
+    const loadAllAvailability = async () => {
+      if (!property.propKey || !property.roomId) return;
+
+      setIsAvailabilityLoading(true);
+      try {
+        const fromDate = new Date();
+        const toDate = addMonths(fromDate, 6);
+        const from = formatDateToYYYYMMDD(fromDate);
+        const to = formatDateToYYYYMMDD(toDate);
+
+        const data = await fetchBookingData(property.propKey, property.roomId, from, to);
+        setAllAvailability(data);
+      } catch (err) {
+        console.error('Failed to fetch all availability:', err);
+      } finally {
+        setIsAvailabilityLoading(false);
+      }
+    };
+
+    loadAllAvailability();
+  }, [property.propKey, property.roomId]);
 
   useEffect(() => {
     const loadBookingData = async () => {
@@ -66,6 +97,39 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
 
     loadBookingData();
   }, [checkIn, checkOut, property.propKey, property.roomId]);
+
+  const handleCheckInSelect = (date: Date | undefined) => {
+    setCheckInDate(date);
+    if (date) {
+      setCheckIn(format(date, "yyyy-MM-dd"));
+      if (checkOutDate && isBefore(checkOutDate, date)) {
+        setCheckOutDate(undefined);
+        setCheckOut("");
+      }
+    } else {
+      setCheckIn("");
+    }
+  };
+
+  const handleCheckOutSelect = (date: Date | undefined) => {
+    setCheckOutDate(date);
+    if (date) {
+      setCheckOut(format(date, "yyyy-MM-dd"));
+    } else {
+      setCheckOut("");
+    }
+  };
+
+  const isDayDisabled = (date: Date) => {
+    if (isBefore(date, startOfToday())) return true;
+
+    if (allAvailability) {
+      const dateKey = formatDateToYYYYMMDD(date);
+      const dayData = allAvailability[dateKey];
+      return dayData && dayData.i === 0;
+    }
+    return false;
+  };
 
   const calculateNights = () => {
     if (!checkIn || !checkOut) return 0;
@@ -235,6 +299,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
 
 
     setIframeUrl(beds24Url.toString());
+    setIsIframeLoading(true);
     setShowIframe(true);
   };
 
@@ -263,10 +328,19 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
               </button>
             </div>
             <div className="flex-1 w-full bg-white relative">
+              {isIframeLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+                  <div className="flex flex-col items-center gap-3">
+                    <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                    <p className="text-sm font-medium text-muted-foreground">Loading booking page...</p>
+                  </div>
+                </div>
+              )}
               <iframe
                 src={iframeUrl}
                 className="w-full h-full border-0"
                 title="Beds24 Booking"
+                onLoad={() => setIsIframeLoading(false)}
               />
             </div>
           </div>
@@ -285,32 +359,62 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
         <div className="border border-border rounded-xl overflow-hidden mb-4">
           <div className="grid grid-cols-2 divide-x divide-border">
             <div className="p-3">
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
+              <label className="block text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wider">
                 CHECK-IN
               </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  className="w-full bg-transparent text-sm text-foreground focus:outline-none"
-                  min={new Date().toISOString().split("T")[0]}
-                />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    className={cn(
+                      "w-full text-left text-sm font-medium focus:outline-none flex items-center gap-2",
+                      !checkInDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="w-4 h-4" />
+                    {checkInDate ? format(checkInDate, "MMM dd, yyyy") : "Add date"}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={checkInDate}
+                    onSelect={handleCheckInSelect}
+                    disabled={isDayDisabled}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="p-3">
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
+              <label className="block text-xs font-medium text-muted-foreground mb-1 uppercase tracking-wider">
                 CHECK-OUT
               </label>
-              <div className="relative">
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  className="w-full bg-transparent text-sm text-foreground focus:outline-none"
-                  min={checkIn || new Date().toISOString().split("T")[0]}
-                />
-              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    disabled={!checkInDate}
+                    className={cn(
+                      "w-full text-left text-sm font-medium focus:outline-none flex items-center gap-2",
+                      !checkOutDate && "text-muted-foreground",
+                      !checkInDate && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    <CalendarIcon className="w-4 h-4" />
+                    {checkOutDate ? format(checkOutDate, "MMM dd, yyyy") : "Add date"}
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={checkOutDate}
+                    onSelect={handleCheckOutSelect}
+                    disabled={(date) =>
+                      isDayDisabled(date) || (checkInDate ? isBefore(date, checkInDate) || date.getTime() === checkInDate.getTime() : false)
+                    }
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <div className="border-t border-border p-3">
