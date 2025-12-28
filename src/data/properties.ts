@@ -1,13 +1,16 @@
-import indianPalmsMain from "@/assets/property-indian-palms-main.jpg";
-import desertOasis from "@/assets/property-desert-oasis.jpg";
-import desertOasis2 from "@/assets/property-desert-oasis-2.jpg";
-import desertOasis3 from "@/assets/property-desert-oasis-3.jpg";
-import desertOasis4 from "@/assets/property-desert-oasis-4.jpg";
-import desertOasis5 from "@/assets/property-desert-oasis-5.jpg";
-import palmSprings from "@/assets/property-palm-springs.jpg";
-import coachellaRanch from "@/assets/property-coachella-ranch.jpg";
-import laQuinta from "@/assets/property-la-quinta.jpg";
-import ranchoMirage from "@/assets/property-rancho-mirage.jpg";
+
+
+export interface UpsellItem {
+  id: string;
+  type: string;
+  price: number;
+  unit: string;
+  period: string;
+  description: {
+    EN: string;
+    VI: string;
+  };
+}
 
 export interface Property {
   id: string;
@@ -34,4 +37,5 @@ export interface Property {
   latitude?: number;
   longitude?: number;
   cleaningFee: string;
+  upsells?: UpsellItem[];
 }
