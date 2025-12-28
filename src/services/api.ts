@@ -389,13 +389,16 @@ export const convertApiPropertyDetailToProperty = (response: NewApiPropertyConte
         cleaningFee: apiProp.roomIds?.[0]?.cleaningFee || 0,
         upsells: apiProp.bookingData?.upsell ? Object.entries(apiProp.bookingData.upsell)
             .filter(([, item]) => item.type !== "0")
-            .map(([id, item]) => ({
-                id,
-                type: item.type.toString(),
-                price: parseFloat(item.price),
-                unit: item.unit,
-                period: item.period,
-                description: item.description || { EN: "", VI: "" }
-            })) : [],
+            .map(([id, item]) => {
+                if (!item.type) return null;
+                return {
+                    id,
+                    type: item?.type?.toString(),
+                    price: parseFloat(item.price),
+                    unit: item.unit,
+                    period: item.period,
+                    description: item.description || { EN: "", VI: "" }
+                }
+            }).filter(Boolean) : [],
     };
 };
