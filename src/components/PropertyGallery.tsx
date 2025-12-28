@@ -11,7 +11,7 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Use placeholder images if none provided
+
   const displayImages = images.length > 0 ? images : [
     "/placeholder.svg",
     "/placeholder.svg",
@@ -43,9 +43,9 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
 
   return (
     <>
-      {/* Main Gallery Layout */}
+      {}
       <div className="space-y-4">
-        {/* Main Image */}
+        {}
         <div
           className="relative aspect-[16/9] rounded-2xl overflow-hidden cursor-pointer group"
           onClick={() => openGallery(currentIndex)}
@@ -57,7 +57,7 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
           />
           <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-smooth" />
 
-          {/* Navigation arrows on main image */}
+          {}
           {displayImages.length > 1 && (
             <>
               <button
@@ -81,12 +81,12 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
             </>
           )}
 
-          {/* Image counter */}
+          {}
           <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-sm text-sm font-medium">
             {currentIndex + 1} / {displayImages.length}
           </div>
 
-          {/* Show all button */}
+          {}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -99,7 +99,7 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
           </button>
         </div>
 
-        {/* Thumbnail Carousel */}
+        {}
         <div className="relative">
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {displayImages.map((image, index) => (
@@ -124,10 +124,10 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
         </div>
       </div>
 
-      {/* Lightbox */}
+      {}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-foreground/95 flex items-center justify-center">
-          {/* Close Button */}
+          {}
           <button
             onClick={closeGallery}
             className="absolute top-4 right-4 p-2 rounded-full bg-background/10 text-primary-foreground hover:bg-background/20 transition-smooth"
@@ -135,7 +135,7 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
             <X size={24} />
           </button>
 
-          {/* Navigation */}
+          {}
           <button
             onClick={goToPrevious}
             className="absolute left-4 p-3 rounded-full bg-background/10 text-primary-foreground hover:bg-background/20 transition-smooth"
@@ -149,19 +149,19 @@ export const PropertyGallery = ({ images, propertyName }: PropertyGalleryProps) 
             <ChevronRight size={24} />
           </button>
 
-          {/* Image */}
+          {}
           <img
             src={displayImages[currentIndex]}
             alt={`${propertyName} - ${currentIndex + 1}`}
             className="max-w-[90vw] max-h-[85vh] object-contain animate-scale-in"
           />
 
-          {/* Counter */}
+          {}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-background/20 text-primary-foreground text-sm">
             {currentIndex + 1} / {displayImages.length}
           </div>
 
-          {/* Thumbnails */}
+          {}
           <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-[90vw] pb-2">
             {displayImages.map((image, index) => (
               <button

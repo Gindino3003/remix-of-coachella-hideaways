@@ -20,7 +20,7 @@ export const PropertyCard = ({ property, className, delay = 0 }: PropertyCardPro
       )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Image */}
+      {}
       <div className="relative aspect-[4/3] overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 to-transparent z-10" />
         {property.images[0] ? (
@@ -34,21 +34,21 @@ export const PropertyCard = ({ property, className, delay = 0 }: PropertyCardPro
             <span className="text-muted-foreground">Image coming soon</span>
           </div>
         )}
-        {/* Price Badge */}
+        {}
         <div className="absolute bottom-4 left-4 z-20">
           <span className="px-3 py-1.5 rounded-full bg-background/95 backdrop-blur-sm text-sm font-semibold text-foreground">
             ${property.pricePerNight}{" "}
             <span className="font-normal text-muted-foreground"></span>
           </span>
         </div>
-        {/* Rating */}
+        {}
         <div className="absolute top-4 right-4 z-20 flex items-center gap-1 px-2 py-1 rounded-full bg-background/95 backdrop-blur-sm">
           <Star size={14} className="fill-sunset text-sunset" />
           <span className="text-sm font-medium">{property.rating}</span>
         </div>
       </div>
 
-      {/* Content */}
+      {}
       <div className="p-5 space-y-3">
         <div>
           <h3 className="font-display text-xl font-semibold text-foreground group-hover:text-primary transition-smooth">

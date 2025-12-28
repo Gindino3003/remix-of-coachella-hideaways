@@ -6,7 +6,7 @@ export const Footer = () => {
     <footer className="bg-foreground text-primary-foreground">
       <div className="container mx-auto px-4 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Brand */}
+          {}
           <div className="space-y-4">
             <h3 className="font-display text-2xl font-semibold">Desert Haven</h3>
             <p className="text-primary-foreground/70 text-sm leading-relaxed">
@@ -29,7 +29,7 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Quick Links</h4>
             <nav className="flex flex-col gap-3">
@@ -54,7 +54,7 @@ export const Footer = () => {
             </nav>
           </div>
 
-          {/* Contact */}
+          {}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Contact</h4>
             <div className="flex flex-col gap-3">
@@ -79,7 +79,7 @@ export const Footer = () => {
             </div>
           </div>
 
-          {/* Newsletter */}
+          {}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Stay Updated</h4>
             <p className="text-primary-foreground/70 text-sm">

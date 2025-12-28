@@ -17,7 +17,7 @@ const Properties = () => {
         setError(null);
         const response = await fetchProperties();
 
-        // Chuyển đổi data từ API sang format của app
+
         const convertedProperties = response.data.map(convertApiPropertyToProperty);
         setProperties(convertedProperties);
       } catch (err) {
@@ -35,7 +35,7 @@ const Properties = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Header */}
+      {}
       <section className="pt-32 pb-16 gradient-sand">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
@@ -51,7 +51,7 @@ const Properties = () => {
         </div>
       </section>
 
-      {/* Properties Grid */}
+      {}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
           {loading ? (

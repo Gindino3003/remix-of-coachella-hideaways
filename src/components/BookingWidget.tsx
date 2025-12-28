@@ -20,12 +20,12 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
   const [bookingData, setBookingData] = useState<BookingResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if property allows pets
+
   const allowsPets = property.houseRules.some(rule =>
     rule.toLowerCase().includes("pets allowed")
   );
 
-  // Extract pet fee from house rules if available
+
   const petFeeMatch = property.houseRules.find(rule =>
     rule.toLowerCase().includes("pets allowed")
   )?.match(/\$(\d+)/);
@@ -43,7 +43,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
       setIsLoading(true);
       try {
         const from = formatStringDateToYYYYMMDD(checkIn);
-        // We fetch up to the day before checkout for pricing
+
         const toDate = new Date(endDate);
         toDate.setDate(toDate.getDate() - 1);
         const to = formatStringDateToYYYYMMDD(toDate.toISOString().split('T')[0]);
@@ -88,7 +88,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
         if (dayData) {
           total += parseFloat(dayData.p1);
         } else {
-          // Fallback if data is missing for a day
+
           total += property.pricePerNight;
         }
       }
@@ -124,7 +124,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
       return;
     }
 
-    // Check availability and min stay from API data
+
     if (bookingData) {
       const start = new Date(checkIn);
       for (let i = 0; i < nights; i++) {
@@ -168,7 +168,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
       description: "Please wait while we transfer you to our secure booking engine.",
     });
 
-    // Construct Beds24 Booking URL
+
     const beds24Url = new URL("https://www.beds24.com/booking2.php");
     beds24Url.searchParams.append("propid", property.id);
     beds24Url.searchParams.append("checkin", checkIn);
@@ -178,24 +178,24 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
       beds24Url.searchParams.append("roomid", property.roomId);
     }
 
-    // Redirect to Beds24
+
     setTimeout(() => {
       window.location.href = beds24Url.toString();
     }, 1500);
   };
 
   const displayPrice = () => {
-    // if (bookingData && checkIn) {
-    //   const dateKey = formatStringDateToYYYYMMDD(checkIn);
-    //   const dayData = bookingData[dateKey];
-    //   if (dayData) return parseFloat(dayData.p1);
-    // }
+
+
+
+
+
     return property.pricePerNight;
   };
 
   return (
     <div className="bg-card border border-border rounded-2xl p-6 shadow-elevated sticky top-24">
-      {/* Price Header */}
+      {}
       <div className="mb-6">
         <span className="font-display text-3xl font-semibold text-foreground">
           ${displayPrice()}
@@ -203,7 +203,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
         <span className="text-muted-foreground"> / night</span>
       </div>
 
-      {/* Date Selection */}
+      {}
       <div className="border border-border rounded-xl overflow-hidden mb-4">
         <div className="grid grid-cols-2 divide-x divide-border">
           <div className="p-3">
@@ -261,43 +261,13 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
         </div>
       </div>
 
-      {/* Pet Option */}
-      {/* {allowsPets && (
-        <div className="mb-4 p-4 rounded-xl bg-secondary/50 border border-border">
-          <div className="flex items-start gap-3">
-            <Checkbox
-              id="hasPet"
-              checked={hasPet}
-              onCheckedChange={(checked) => setHasPet(checked as boolean)}
-              className="mt-0.5"
-            />
-            <div className="flex-1">
-              <label
-                htmlFor="hasPet"
-                className="flex items-center gap-2 text-sm font-medium text-foreground cursor-pointer"
-              >
-                <PawPrint size={16} className="text-primary" />
-                Bringing a pet?
-              </label>
-              <p className="text-xs text-muted-foreground mt-1">
-                Pet fee: ${petFee} (one-time fee, requires prior approval)
-              </p>
-            </div>
-          </div>
-        </div>
-      )} */}
+      {}
+      {}
 
-      {/* No Pets Notice */}
-      {/* {!allowsPets && (
-        <div className="mb-4 p-3 rounded-xl bg-muted/50 border border-border">
-          <p className="text-xs text-muted-foreground flex items-center gap-2">
-            <PawPrint size={14} />
-            No pets allowed at this property
-          </p>
-        </div>
-      )} */}
+      {}
+      {}
 
-      {/* Book Button */}
+      {}
       <Button
         variant="accent"
         size="xl"
@@ -315,14 +285,12 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
         )}
       </Button>
 
-      {/* <p className="text-center text-sm text-muted-foreground mb-6">
-        You won't be charged yet
-      </p> */}
+      {}
 
-      {/* Price Breakdown */}
+      {}
       {nights > 0 && (
         <div className="space-y-4 pt-4 border-t border-border">
-          {/* Daily Details List */}
+          {}
           {bookingData && (
             <div className="space-y-2">
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
@@ -381,21 +349,8 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
             </span>
             <span className="text-foreground">${cleaningFee}</span>
           </div>
-          {/* <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground underline cursor-help">
-              Service fee
-            </span>
-            <span className="text-foreground">${serviceFee}</span>
-          </div> */}
-          {/* {hasPet && (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground underline cursor-help flex items-center gap-1">
-                <PawPrint size={12} />
-                Pet fee
-              </span>
-              <span className="text-foreground">${petFeeTotal}</span>
-            </div>
-          )} */}
+          {}
+          {}
           <div className="flex justify-between font-semibold pt-3 border-t border-border">
             <span>Total</span>
             <span>${total}</span>

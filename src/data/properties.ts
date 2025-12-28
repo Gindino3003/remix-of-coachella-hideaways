@@ -26,6 +26,7 @@ export interface Property {
   rating: number;
   reviews: number;
   amenities: string[];
+  groupedAmenities?: Record<string, string[]>;
   houseRules: string[];
   images: string[];
   featured: boolean;

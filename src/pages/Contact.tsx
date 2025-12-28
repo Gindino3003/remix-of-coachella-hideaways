@@ -27,7 +27,7 @@ const Contact = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Header */}
+      {}
       <section className="pt-32 pb-16 gradient-sand">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
@@ -42,11 +42,11 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Content */}
+      {}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 max-w-6xl mx-auto">
-            {/* Contact Form */}
+            {}
             <div className="opacity-0 animate-fade-in-up">
               <h2 className="font-display text-2xl font-semibold mb-6">
                 Send Us a Message
@@ -138,7 +138,7 @@ const Contact = () => {
               </form>
             </div>
 
-            {/* Contact Info */}
+            {}
             <div className="opacity-0 animate-fade-in-up animation-delay-200">
               <h2 className="font-display text-2xl font-semibold mb-6">
                 Get in Touch
@@ -194,7 +194,7 @@ const Contact = () => {
                 </div>
               </div>
 
-              {/* FAQ Note */}
+              {}
               <div className="mt-12 p-6 rounded-2xl bg-secondary">
                 <h3 className="font-semibold mb-2">Need Help?</h3>
                 <p className="text-sm text-muted-foreground">

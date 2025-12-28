@@ -22,10 +22,10 @@ const Index = () => {
         setError(null);
         const response = await fetchProperties();
 
-        // Chuyển đổi data từ API sang format của app và giới hạn chỉ lấy 6 phần tử
+
         const convertedProperties = response.data
           .map(convertApiPropertyToProperty)
-          .slice(0, 6); // Chỉ lấy tối đa 6 properties
+          .slice(0, 6);
         setProperties(convertedProperties);
       } catch (err) {
         console.error('Failed to fetch properties:', err);
@@ -42,10 +42,10 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero Section */}
+      {}
       <Hero backgroundImage={heroImage} />
 
-      {/* Featured Properties */}
+      {}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-16">
@@ -105,7 +105,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Why Book Direct */}
+      {}
       <section className="py-24 gradient-sand">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-16">
@@ -160,7 +160,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {}
       <section className="py-24 bg-foreground text-primary-foreground">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h2 className="font-display text-4xl md:text-5xl font-semibold mb-6">

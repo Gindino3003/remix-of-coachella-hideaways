@@ -15,8 +15,38 @@ import {
   Check,
   ArrowLeft,
   AlertCircle,
+  CheckCircle,
+  Briefcase,
+  Tv,
+  UtensilsCrossed,
+  Wifi,
+  CookingPot,
+  PawPrint,
+  Waves,
+  Settings,
+  Trophy,
+  Accessibility,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const getGroupIcon = (group: string) => {
+  switch (group) {
+    case "Amenities": return CheckCircle;
+    case "Business": return Briefcase;
+    case "Entertainment": return Tv;
+    case "Food and Drink": return UtensilsCrossed;
+    case "Internet": return Wifi;
+    case "Kitchen": return CookingPot;
+    case "Location": return MapPin;
+    case "Pets": return PawPrint;
+    case "Pool and Wellness": return Waves;
+    case "Services": return Settings;
+    case "Sports": return Trophy;
+    case "Suitability": return Accessibility;
+    default: return Check;
+  }
+};
+
 
 const PropertyDetail = () => {
   const { id: propkey } = useParams();
@@ -39,7 +69,7 @@ const PropertyDetail = () => {
         setError(null);
         const response = await fetchPropertyById(propkey);
 
-        // Chuyển đổi data từ API sang format của app
+
         const convertedProperty = convertApiPropertyDetailToProperty(response, city, state, propkey);
         setProperty(convertedProperty);
       } catch (err) {
@@ -52,7 +82,7 @@ const PropertyDetail = () => {
     loadProperty();
   }, [propkey, city, state]);
 
-  // Loading state
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -70,7 +100,7 @@ const PropertyDetail = () => {
     );
   }
 
-  // Error or not found state
+
   if (error || !property) {
     return (
       <div className="min-h-screen bg-background">
@@ -98,20 +128,20 @@ const PropertyDetail = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Gallery */}
+      {}
       <section className="pt-24 pb-8">
         <div className="container mx-auto px-4 lg:px-8">
           <PropertyGallery images={property.images} propertyName={property.name} />
         </div>
       </section>
 
-      {/* Content */}
+      {}
       <section className="py-8">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Main Content */}
+            {}
             <div className="lg:col-span-2 space-y-8">
-              {/* Header */}
+              {}
               <div className="border-b border-border pb-8">
                 <div className="flex items-center gap-2 mb-2">
                   <MapPin size={16} className="text-primary" />
@@ -144,7 +174,7 @@ const PropertyDetail = () => {
                 </div>
               </div>
 
-              {/* Description */}
+              {}
               <div className="border-b border-border pb-8">
                 <h2 className="font-display text-2xl font-semibold mb-4">
                   About This Property
@@ -154,27 +184,40 @@ const PropertyDetail = () => {
                 </p>
               </div>
 
-              {/* Amenities */}
-              {property.amenities && property.amenities.length > 0 && (
+              {}
+              {property.groupedAmenities && Object.keys(property.groupedAmenities).length > 0 && (
                 <div className="border-b border-border pb-8">
                   <h2 className="font-display text-2xl font-semibold mb-6">
                     Amenities
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {property.amenities.map((amenity, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-3 text-foreground"
-                      >
-                        <Check size={18} className="text-primary flex-shrink-0" />
-                        <span>{amenity}</span>
-                      </div>
-                    ))}
+                  <div className="space-y-8">
+                    {Object.entries(property.groupedAmenities).map(([group, items], groupIndex) => {
+                      const Icon = getGroupIcon(group);
+                      return (
+                        <div key={groupIndex}>
+                          <div className="flex items-center gap-2 mb-4 text-primary">
+                            <Icon size={20} />
+                            <h3 className="font-semibold text-lg">{group}</h3>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {items.map((amenity, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center gap-3 text-foreground"
+                              >
+                                <Check size={18} className="text-primary/60 flex-shrink-0" />
+                                <span className="text-sm md:text-base">{amenity}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
-              {/* House Rules */}
+              {}
               {property.houseRules && property.houseRules.length > 0 && (
                 <div>
                   <h2 className="font-display text-2xl font-semibold mb-6">
@@ -198,7 +241,7 @@ const PropertyDetail = () => {
               )}
             </div>
 
-            {/* Booking Widget */}
+            {}
             <div className="lg:col-span-1">
               <BookingWidget property={property} />
             </div>
