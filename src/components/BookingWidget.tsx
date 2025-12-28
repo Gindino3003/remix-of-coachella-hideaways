@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { fetchBookingData, formatStringDateToYYYYMMDD, BookingResponse, formatDateToYYYYMMDD } from "@/services/bookingApi";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format, addMonths, isBefore, startOfToday, parseISO } from "date-fns";
+import { format, addMonths, isBefore, startOfToday, parseISO, startOfMonth, endOfMonth } from "date-fns";
 
 interface BookingWidgetProps {
   property: Property;
@@ -26,6 +26,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
   const [allAvailability, setAllAvailability] = useState<BookingResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAvailabilityLoading, setIsAvailabilityLoading] = useState(false);
+  const [loadedMonths, setLoadedMonths] = useState<Set<string>>(new Set());
   const [selectedUpsells, setSelectedUpsells] = useState<Set<string>>(new Set());
   const [showIframe, setShowIframe] = useState(false);
   const [iframeUrl, setIframeUrl] = useState("");
@@ -41,28 +42,47 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
   )?.match(/\$(\d+)/);
   const petFee = petFeeMatch ? parseInt(petFeeMatch[1]) : 50;
 
+  const loadAvailability = async (startDate: Date, monthsToLoad: number = 3) => {
+    if (!property.propKey || !property.roomId) return;
+
+    const fromDate = startOfMonth(startDate);
+    const toDate = endOfMonth(addMonths(fromDate, monthsToLoad - 1));
+    const from = formatDateToYYYYMMDD(fromDate);
+    const to = formatDateToYYYYMMDD(toDate);
+
+    const monthKeys: string[] = [];
+    for (let i = 0; i < monthsToLoad; i++) {
+      monthKeys.push(format(addMonths(fromDate, i), "yyyy-MM"));
+    }
+
+    if (monthKeys.every(m => loadedMonths.has(m))) return;
+
+    setIsAvailabilityLoading(true);
+    try {
+      const data = await fetchBookingData(property.propKey, property.roomId, from, to);
+      setAllAvailability(prev => ({ ...prev, ...data }));
+      setLoadedMonths(prev => {
+        const next = new Set(prev);
+        monthKeys.forEach(m => next.add(m));
+        return next;
+      });
+    } catch (err) {
+      console.error('Failed to fetch availability:', err);
+    } finally {
+      setIsAvailabilityLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadAllAvailability = async () => {
-      if (!property.propKey || !property.roomId) return;
-
-      setIsAvailabilityLoading(true);
-      try {
-        const fromDate = new Date();
-        const toDate = addMonths(fromDate, 6);
-        const from = formatDateToYYYYMMDD(fromDate);
-        const to = formatDateToYYYYMMDD(toDate);
-
-        const data = await fetchBookingData(property.propKey, property.roomId, from, to);
-        setAllAvailability(data);
-      } catch (err) {
-        console.error('Failed to fetch all availability:', err);
-      } finally {
-        setIsAvailabilityLoading(false);
-      }
-    };
-
-    loadAllAvailability();
+    loadAvailability(new Date(), 3);
   }, [property.propKey, property.roomId]);
+
+  const handleMonthChange = (month: Date) => {
+    const monthKey = format(month, "yyyy-MM");
+    if (!loadedMonths.has(monthKey)) {
+      loadAvailability(month, 3);
+    }
+  };
 
   useEffect(() => {
     const loadBookingData = async () => {
@@ -375,13 +395,21 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={checkInDate}
-                    onSelect={handleCheckInSelect}
-                    disabled={isDayDisabled}
-                    initialFocus
-                  />
+                  <div className="relative">
+                    {isAvailabilityLoading && (
+                      <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-[1px]">
+                        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                      </div>
+                    )}
+                    <Calendar
+                      mode="single"
+                      selected={checkInDate}
+                      onSelect={handleCheckInSelect}
+                      disabled={isDayDisabled}
+                      onMonthChange={handleMonthChange}
+                      initialFocus
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
@@ -404,15 +432,23 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={checkOutDate}
-                    onSelect={handleCheckOutSelect}
-                    disabled={(date) =>
-                      isDayDisabled(date) || (checkInDate ? isBefore(date, checkInDate) || date.getTime() === checkInDate.getTime() : false)
-                    }
-                    initialFocus
-                  />
+                  <div className="relative">
+                    {isAvailabilityLoading && (
+                      <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-[1px]">
+                        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                      </div>
+                    )}
+                    <Calendar
+                      mode="single"
+                      selected={checkOutDate}
+                      onSelect={handleCheckOutSelect}
+                      disabled={(date) =>
+                        isDayDisabled(date) || (checkInDate ? isBefore(date, checkInDate) || date.getTime() === checkInDate.getTime() : false)
+                      }
+                      onMonthChange={handleMonthChange}
+                      initialFocus
+                    />
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
