@@ -58,7 +58,7 @@ export const PropertyCard = ({ property, className, delay = 0 }: PropertyCardPro
         </div>
 
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {property.tagline}
+          {property.description}
         </p>
 
         <div className="flex items-center gap-4 pt-2 border-t border-border">

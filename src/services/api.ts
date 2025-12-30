@@ -142,7 +142,7 @@ const apiClient = axios.create({
 
 export const fetchProperties = async (): Promise<ApiResponse> => {
     try {
-        const response = await apiClient.get<ApiResponse>('https://joincomvoca.com/panel/public_api.php');
+        const response = await apiClient.get<ApiResponse>('https://tamlinhaz.xyz/upwork/api/demo.php');
         return response.data;
     } catch (error) {
         console.error('Error fetching properties:', error);
@@ -172,7 +172,7 @@ export const convertApiPropertyToProperty = (apiProp: ApiProperty): any => {
 
 
     const imageUrl = apiProp.cover_image
-        ? `${API_BASE_URL}/${apiProp.cover_image}`
+        ? `${apiProp.cover_image}`
         : null;
 
     return {
