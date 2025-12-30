@@ -10,6 +10,10 @@ import { ArrowRight, Shield, Star, Clock } from "lucide-react";
 import heroImage from "@/assets/property-indian-palms-main.jpg";
 import { fetchProperties, convertApiPropertyToProperty } from "@/services/api";
 
+// Cấu hình Cache giống bên trang Properties để dùng chung dữ liệu
+const CACHE_KEY = "properties_data_cache";
+const CACHE_EXPIRY = 15 * 60 * 1000; // 24 giờ
+
 const Index = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,16 +21,51 @@ const Index = () => {
 
   useEffect(() => {
     const loadProperties = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
+        // 1. Kiểm tra LocalStorage
+        const cachedData = localStorage.getItem(CACHE_KEY);
+
+        if (cachedData) {
+          try {
+            const { data, timestamp } = JSON.parse(cachedData);
+            const now = Date.now();
+
+            // 2. Nếu còn hạn (< 24h)
+            if (now - timestamp < CACHE_EXPIRY) {
+              console.log("Home: Loading from cache...");
+              // Lưu ý: Trang chủ chỉ lấy 6 cái đầu tiên để hiển thị
+              setProperties(data.slice(0, 6)); 
+              setLoading(false);
+              return; // Dừng, không gọi API
+            } else {
+              console.log("Home: Cache expired.");
+              localStorage.removeItem(CACHE_KEY);
+            }
+          } catch (e) {
+            console.error("Home: Error parsing cache", e);
+            localStorage.removeItem(CACHE_KEY);
+          }
+        }
+
+        // 3. Nếu không có cache hoặc hết hạn -> Gọi API
         const response = await fetchProperties();
+        
+        // Convert toàn bộ dữ liệu
+        const allProperties = response.data.map(convertApiPropertyToProperty);
 
+        // 4. Lưu TOÀN BỘ vào cache (để trang Properties có thể dùng lại)
+        const dataToCache = {
+            data: allProperties,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(dataToCache));
 
-        const convertedProperties = response.data
-          .map(convertApiPropertyToProperty)
-          .slice(0, 6);
-        setProperties(convertedProperties);
+        // 5. Chỉ set state 6 cái cho trang chủ
+        setProperties(allProperties.slice(0, 6));
+
       } catch (err) {
         console.error('Failed to fetch properties:', err);
         setError('Unable to load the property list. Please try again later.');
@@ -42,10 +81,10 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {}
+      {/* Hero Section */}
       <Hero backgroundImage={heroImage} />
 
-      {}
+      {/* Featured Properties Section */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-16">
@@ -69,7 +108,11 @@ const Index = () => {
               <div className="text-center max-w-md">
                 <p className="text-destructive mb-4">{error}</p>
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                    // Xóa cache khi retry để ép tải mới
+                    localStorage.removeItem(CACHE_KEY);
+                    window.location.reload();
+                  }}
                   className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   Thử lại
@@ -105,7 +148,7 @@ const Index = () => {
         </div>
       </section>
 
-      {}
+      {/* Why Book Direct Section */}
       <section className="py-24 gradient-sand">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-16">
@@ -160,7 +203,7 @@ const Index = () => {
         </div>
       </section>
 
-      {}
+      {/* Call to Action Section */}
       <section className="py-24 bg-foreground text-primary-foreground">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h2 className="font-display text-4xl md:text-5xl font-semibold mb-6">

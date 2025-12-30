@@ -5,6 +5,9 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { Property } from "@/data/properties";
 import { fetchProperties, convertApiPropertyToProperty } from "@/services/api";
 
+const CACHE_KEY = "properties_data_cache";
+const CACHE_EXPIRY = 15 * 60 * 1000; // 24 giờ tính bằng milliseconds
+
 const Properties = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,14 +15,49 @@ const Properties = () => {
 
   useEffect(() => {
     const loadProperties = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
+        // 1. Kiểm tra cache trong LocalStorage
+        const cachedData = localStorage.getItem(CACHE_KEY);
+
+        if (cachedData) {
+          try {
+            const { data, timestamp } = JSON.parse(cachedData);
+            const now = Date.now();
+
+            // 2. Kiểm tra xem cache còn hạn không
+            if (now - timestamp < CACHE_EXPIRY) {
+              console.log("Loading properties from cache...");
+              setProperties(data);
+              setLoading(false);
+              return; // Dừng hàm tại đây, không gọi API nữa
+            } else {
+              console.log("Cache expired. Fetching new data...");
+              // Nếu hết hạn thì xóa cache cũ đi cho sạch (tùy chọn)
+              localStorage.removeItem(CACHE_KEY);
+            }
+          } catch (e) {
+            // Nếu JSON lỗi thì bỏ qua và gọi API như bình thường
+            console.error("Error parsing cache", e);
+            localStorage.removeItem(CACHE_KEY);
+          }
+        }
+
+        // 3. Gọi API nếu không có cache hoặc cache hết hạn
         const response = await fetchProperties();
-
-
         const convertedProperties = response.data.map(convertApiPropertyToProperty);
+        
         setProperties(convertedProperties);
+
+        // 4. Lưu dữ liệu mới vào LocalStorage kèm thời gian hiện tại
+        const dataToCache = {
+            data: convertedProperties,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(dataToCache));
+
       } catch (err) {
         console.error('Failed to fetch properties:', err);
         setError('Unable to load the property list. Please try again later.');
@@ -35,7 +73,7 @@ const Properties = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {}
+      {/* Hero Section */}
       <section className="pt-32 pb-16 gradient-sand">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-3xl">
@@ -51,7 +89,7 @@ const Properties = () => {
         </div>
       </section>
 
-      {}
+      {/* Properties Grid */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
           {loading ? (
@@ -66,7 +104,11 @@ const Properties = () => {
               <div className="text-center max-w-md">
                 <p className="text-destructive mb-4">{error}</p>
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                     // Khi thử lại thủ công, ta nên xóa cache để ép buộc tải mới
+                     localStorage.removeItem(CACHE_KEY);
+                     window.location.reload();
+                  }}
                   className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   Thử lại
