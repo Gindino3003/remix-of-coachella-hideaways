@@ -213,6 +213,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
     return `${days[date.getUTCDay()]} ${date.getUTCDate().toString().padStart(2, '0')} ${months[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
   };
 
+  // --- ĐÃ SỬA: THÊM HÀNH ĐỘNG "Book" ---
   const handleBooking = () => {
     if (!checkIn || !checkOut) {
       toast({ title: "Please select dates", description: "Choose check-in/out dates.", variant: "destructive" });
@@ -227,7 +228,14 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
 
     const beds24Url = new URL("https://www.beds24.com/booking2.php");
     beds24Url.searchParams.append("propid", property.id);
-    if (property.roomId) beds24Url.searchParams.append("roomid", property.roomId);
+    
+    // SỬA Ở ĐÂY: Thêm roomid và lệnh Book tương ứng
+    if (property.roomId) {
+        beds24Url.searchParams.append("roomid", property.roomId);
+        // Quan trọng: Tên tham số là "br1-" + roomID, giá trị là "Book"
+        beds24Url.searchParams.append(`br1-${property.roomId}`, "Book");
+    }
+
     beds24Url.searchParams.append("checkin", formatBeds24Date(checkIn));
     beds24Url.searchParams.append("checkin_hide", checkIn);
     beds24Url.searchParams.append("checkout", formatBeds24Date(checkOut));
@@ -306,7 +314,7 @@ export const BookingWidget = ({ property }: BookingWidgetProps) => {
             </div>
           </div>
           
-          {/* PHẦN GUESTS - ĐÃ LÀM ĐẸP VỚI POPOVER VÀ COUNTER */}
+          {/* PHẦN GUESTS */}
           <div className="border-t border-border p-3">
             <label className="block text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-wider">GUESTS</label>
             <Popover>
