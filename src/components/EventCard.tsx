@@ -9,26 +9,38 @@ interface EventCardProps {
 }
 
 export const EventCard = ({ event, className, delay = 0 }: EventCardProps) => {
-  const CardContent = () => (
+const CardContent = () => (
     <>
-      {}
+      {/* Image */}
+      {event.image && (
+        <div className="relative aspect-[16/9] overflow-hidden rounded-xl mb-4 -mx-2 -mt-2">
+          <img
+            src={event.image}
+            alt={event.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-smooth duration-700"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 to-transparent" />
+        </div>
+      )}
+
+      {/* Category Badge */}
       <div className="mb-4">
         <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
           {event.category}
         </span>
       </div>
 
-      {}
+      {/* Title */}
       <h3 className="font-display text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-smooth">
         {event.title}
       </h3>
 
-      {}
+      {/* Description */}
       <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
         {event.description}
       </p>
 
-      {}
+      {/* Details */}
       <div className="space-y-2 mt-auto">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Calendar size={14} className="text-primary" />
