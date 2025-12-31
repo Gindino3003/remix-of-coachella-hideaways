@@ -7,12 +7,12 @@ import { Property } from "@/data/properties";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Star, Clock } from "lucide-react";
-import heroImage from "@/assets/property-indian-palms-main.jpg";
 import { fetchProperties, convertApiPropertyToProperty } from "@/services/api";
 
 // Cấu hình Cache giống bên trang Properties để dùng chung dữ liệu
 const CACHE_KEY = "properties_data_cache";
-const CACHE_EXPIRY = 15 * 60 * 1000; // 24 giờ
+const heroImage = "https://joincomvoca.com/assets1/hero-desert-villa-WlOU5XB3.jpg";
+const CACHE_EXPIRY = 1000; // 24 giờ
 
 const Index = () => {
   const [properties, setProperties] = useState<Property[]>([]);

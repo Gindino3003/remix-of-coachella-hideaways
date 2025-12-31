@@ -27,7 +27,7 @@ export const Navbar = () => {
     >
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {}
+          {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span
               className={cn(
@@ -35,11 +35,11 @@ export const Navbar = () => {
                 isHome ? "text-primary-foreground" : "text-foreground"
               )}
             >
-              Desert Haven
+              PalmScape Villas
             </span>
           </Link>
 
-          {}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
@@ -67,7 +67,7 @@ export const Navbar = () => {
             </Button>
           </div>
 
-          {}
+          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={cn(
@@ -81,7 +81,7 @@ export const Navbar = () => {
           </button>
         </div>
 
-        {}
+        {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden absolute top-20 left-0 right-0 bg-background/98 backdrop-blur-md border-b border-border animate-fade-in">
             <div className="container mx-auto px-4 py-6 flex flex-col gap-4">

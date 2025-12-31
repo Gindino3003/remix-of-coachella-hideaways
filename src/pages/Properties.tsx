@@ -6,7 +6,7 @@ import { Property } from "@/data/properties";
 import { fetchProperties, convertApiPropertyToProperty } from "@/services/api";
 
 const CACHE_KEY = "properties_data_cache";
-const CACHE_EXPIRY = 15 * 60 * 1000; // 24 giờ tính bằng milliseconds
+const CACHE_EXPIRY = 1000; // 24 giờ tính bằng milliseconds
 
 const Properties = () => {
   const [properties, setProperties] = useState<Property[]>([]);

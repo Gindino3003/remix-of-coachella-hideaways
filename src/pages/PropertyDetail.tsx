@@ -15,38 +15,38 @@ import {
   Check,
   ArrowLeft,
   AlertCircle,
-  CheckCircle,
-  Briefcase,
-  Tv,
-  UtensilsCrossed,
+  LayoutGrid,
+  Utensils,
   Wifi,
-  CookingPot,
-  PawPrint,
-  Waves,
-  Settings,
-  Trophy,
-  Accessibility,
+  Gamepad2,
+  Car,
+  Trees,
+  Shield,
+  Baby,
+  Armchair,
+  Shirt, 
+  Sparkles,
+  Bath as BathIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const getGroupIcon = (group: string) => {
-  switch (group) {
-    case "Amenities": return CheckCircle;
-    case "Business": return Briefcase;
-    case "Entertainment": return Tv;
-    case "Food and Drink": return UtensilsCrossed;
-    case "Internet": return Wifi;
-    case "Kitchen": return CookingPot;
-    case "Location": return MapPin;
-    case "Pets": return PawPrint;
-    case "Pool and Wellness": return Waves;
-    case "Services": return Settings;
-    case "Sports": return Trophy;
-    case "Suitability": return Accessibility;
-    default: return Check;
-  }
+// Hàm chọn Icon
+const getCategoryIcon = (title: string) => {
+  const normalizedTitle = title ? title.toLowerCase() : "";
+  
+  if (normalizedTitle.includes("property")) return LayoutGrid;
+  if (normalizedTitle.includes("outdoor") || normalizedTitle.includes("pool")) return Trees;
+  if (normalizedTitle.includes("kitchen") || normalizedTitle.includes("dining")) return Utensils;
+  if (normalizedTitle.includes("sleep") || normalizedTitle.includes("comfort")) return Armchair;
+  if (normalizedTitle.includes("tech") || normalizedTitle.includes("wifi")) return Wifi;
+  if (normalizedTitle.includes("entertain")) return Gamepad2;
+  if (normalizedTitle.includes("laundry") || normalizedTitle.includes("clean")) return Shirt;
+  if (normalizedTitle.includes("parking")) return Car;
+  if (normalizedTitle.includes("family")) return Baby;
+  if (normalizedTitle.includes("safe") || normalizedTitle.includes("secur")) return Shield;
+  if (normalizedTitle.includes("bath")) return BathIcon;
+  return Sparkles; 
 };
-
 
 const PropertyDetail = () => {
   const { id: propkey } = useParams();
@@ -68,12 +68,11 @@ const PropertyDetail = () => {
         setLoading(true);
         setError(null);
         const response = await fetchPropertyById(propkey);
-
-
         const convertedProperty = convertApiPropertyDetailToProperty(response, city, state, propkey);
         setProperty(convertedProperty);
       } catch (err) {
         console.error('Failed to fetch property:', err);
+        setError("Failed to load property details. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -81,7 +80,6 @@ const PropertyDetail = () => {
 
     loadProperty();
   }, [propkey, city, state]);
-
 
   if (loading) {
     return (
@@ -99,7 +97,6 @@ const PropertyDetail = () => {
       </div>
     );
   }
-
 
   if (error || !property) {
     return (
@@ -124,24 +121,27 @@ const PropertyDetail = () => {
     );
   }
 
+  // Lấy danh sách amenities, nếu không có thì trả về mảng rỗng để không bị lỗi
+  const amenitiesList = property.amenities || [];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {}
       <section className="pt-24 pb-8">
         <div className="container mx-auto px-4 lg:px-8">
           <PropertyGallery images={property.images} propertyName={property.name} />
         </div>
       </section>
 
-      {}
       <section className="py-8">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {}
+            
+            {/* Cột chính bên trái */}
             <div className="lg:col-span-2 space-y-8">
-              {}
+              
+              {/* Thông tin cơ bản */}
               <div className="border-b border-border pb-8">
                 <div className="flex items-center gap-2 mb-2">
                   <MapPin size={16} className="text-primary" />
@@ -150,6 +150,11 @@ const PropertyDetail = () => {
                 <h1 className="font-display text-4xl md:text-5xl font-semibold text-foreground mb-4">
                   {property.name}
                 </h1>
+                {property.tagline && (
+                    <p className="text-lg text-muted-foreground mb-4 italic">
+                        {property.tagline}
+                    </p>
+                )}
                 <div className="flex flex-wrap items-center gap-4 text-sm">
                   <div className="flex items-center gap-1">
                     <Star size={16} className="fill-sunset text-sunset" />
@@ -174,42 +179,61 @@ const PropertyDetail = () => {
                 </div>
               </div>
 
-              {}
+              {/* Mô tả */}
               <div className="border-b border-border pb-8">
                 <h2 className="font-display text-2xl font-semibold mb-4">
                   About This Property
                 </h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  {property.description}
-                </p>
+                <div className="text-muted-foreground leading-relaxed space-y-4">
+                  {property.description.split('\n').map((line, i) => {
+                    if (!line.trim()) return <br key={i}/>;
+                    return (
+                      <div key={i} className={`${line.trim().startsWith('-') ? 'pl-4' : ''}`}>
+                        {line.split(/(\*\*[^*]+\*\*)/).map((part, j) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return (
+                              <strong key={j} className="text-foreground font-semibold">
+                                {part.slice(2, -2)}
+                              </strong>
+                            );
+                          }
+                          return <span key={j}>{part}</span>;
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
-              {}
-              {property.groupedAmenities && Object.keys(property.groupedAmenities).length > 0 && (
+              {/* Phần Amenities mới - Hiển thị 2 cột */}
+              {amenitiesList.length > 0 && (
                 <div className="border-b border-border pb-8">
-                  <h2 className="font-display text-2xl font-semibold mb-6">
+                  <h2 className="font-display text-2xl font-semibold mb-8">
                     Amenities
                   </h2>
-                  <div className="space-y-8">
-                    {Object.entries(property.groupedAmenities).map(([group, items], groupIndex) => {
-                      const Icon = getGroupIcon(group);
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                    {amenitiesList.map((group, index) => {
+                      if (!group) return null;
+                      const IconComponent = getCategoryIcon(group.title);
+                      
                       return (
-                        <div key={groupIndex}>
-                          <div className="flex items-center gap-2 mb-4 text-primary">
-                            <Icon size={20} />
-                            <h3 className="font-semibold text-lg">{group}</h3>
+                        <div key={index} className="flex flex-col gap-3">
+                          <div className="flex items-center gap-2">
+                            <IconComponent className="w-5 h-5 text-orange-500" /> 
+                            <h3 className="font-semibold text-foreground text-base">
+                              {group.title}
+                            </h3>
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {items.map((amenity, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-3 text-foreground"
-                              >
-                                <Check size={18} className="text-primary/60 flex-shrink-0" />
-                                <span className="text-sm md:text-base">{amenity}</span>
-                              </div>
+
+                          <ul className="space-y-2 pl-1">
+                            {group.items && group.items.map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                <Check className="w-4 h-4 text-primary/60 mt-0.5 shrink-0" />
+                                <span>{item}</span>
+                              </li>
                             ))}
-                          </div>
+                          </ul>
                         </div>
                       );
                     })}
@@ -217,7 +241,7 @@ const PropertyDetail = () => {
                 </div>
               )}
 
-              {}
+              {/* Nội quy */}
               {property.houseRules && property.houseRules.length > 0 && (
                 <div>
                   <h2 className="font-display text-2xl font-semibold mb-6">
@@ -241,7 +265,7 @@ const PropertyDetail = () => {
               )}
             </div>
 
-            {}
+            {/* Sidebar Booking */}
             <div className="lg:col-span-1">
               <BookingWidget property={property} />
             </div>

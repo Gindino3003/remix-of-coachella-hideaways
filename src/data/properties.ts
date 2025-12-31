@@ -1,5 +1,3 @@
-
-
 export interface UpsellItem {
   id: string;
   type: string;
@@ -28,8 +26,17 @@ export interface Property {
   pricePerNight: number;
   rating: number;
   reviews: number;
-  amenities: string[];
+  
+  // Cấu trúc Amenities mới
+  amenities?: {
+    icon: string;
+    title: string;
+    items: string[];
+  }[];
+  
+  // Các trường cũ giữ lại để tương thích
   groupedAmenities?: Record<string, string[]>;
+  amenitiesList?: string[];
   houseRules: string[];
   images: string[];
   featured: boolean;
@@ -38,4 +45,7 @@ export interface Property {
   longitude?: number;
   cleaningFee: string;
   upsells?: UpsellItem[];
+  checkInTime?: string;
+  checkOutTime?: string;
+  directions?: string;
 }

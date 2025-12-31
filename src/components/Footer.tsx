@@ -6,9 +6,9 @@ export const Footer = () => {
     <footer className="bg-foreground text-primary-foreground">
       <div className="container mx-auto px-4 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {}
+          {/* Brand */}
           <div className="space-y-4">
-            <h3 className="font-display text-2xl font-semibold">Desert Haven</h3>
+            <h3 className="font-display text-2xl font-semibold">PalmScape Villas</h3>
             <p className="text-primary-foreground/70 text-sm leading-relaxed">
               Luxury vacation rentals in the heart of Coachella Valley. 
               Experience the desert in style.
@@ -29,7 +29,7 @@ export const Footer = () => {
             </div>
           </div>
 
-          {}
+          {/* Quick Links */}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Quick Links</h4>
             <nav className="flex flex-col gap-3">
@@ -54,32 +54,35 @@ export const Footer = () => {
             </nav>
           </div>
 
-          {}
+          {/* Contact */}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Contact</h4>
             <div className="flex flex-col gap-3">
               <a
-                href="mailto:hello@deserthaven.com"
+                href="mailto:hello@palmscapevillas.com"
                 className="flex items-center gap-3 text-primary-foreground/70 hover:text-primary-foreground text-sm transition-smooth"
               >
                 <Mail size={16} />
-                hello@deserthaven.com
+                hello@palmscapevillas.com
               </a>
               <a
-                href="tel:+17605551234"
+                href="tel:+19498364900"
                 className="flex items-center gap-3 text-primary-foreground/70 hover:text-primary-foreground text-sm transition-smooth"
               >
                 <Phone size={16} />
-                (760) 555-1234
+                (949) 836-4900
               </a>
-              <span className="flex items-center gap-3 text-primary-foreground/70 text-sm">
-                <MapPin size={16} />
-                Coachella Valley, CA
-              </span>
+              <div className="flex items-start gap-3 text-primary-foreground/70 text-sm">
+                <MapPin size={16} className="flex-shrink-0 mt-0.5" />
+                <div>
+                  <p>Coachella Valley, CA</p>
+                  <p className="text-primary-foreground/50 text-xs mt-1">Indio • Bermuda Dunes • Palm Springs</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {}
+          {/* Newsletter */}
           <div className="space-y-4">
             <h4 className="font-semibold text-lg">Stay Updated</h4>
             <p className="text-primary-foreground/70 text-sm">
@@ -103,7 +106,7 @@ export const Footer = () => {
 
         <div className="mt-16 pt-8 border-t border-primary-foreground/10 text-center">
           <p className="text-primary-foreground/50 text-sm">
-            © {new Date().getFullYear()} Desert Haven Rentals. All rights reserved.
+            © {new Date().getFullYear()} PalmScape Villas. All rights reserved.
           </p>
         </div>
       </div>
